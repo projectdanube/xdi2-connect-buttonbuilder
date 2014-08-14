@@ -1,30 +1,33 @@
-<img src="http://respectnetwork.github.com/rn-member-graph-service/images/logo.png"><br>
+<a href="http://projectdanube.org/" target="_blank"><img src="http://projectdanube.github.com/xdi2/images/projectdanube_logo.png" align="right"></a>
+<img src="http://projectdanube.github.com/xdi2/images/logo64.png"><br>
 
-Respect Network Respect Connect Builder
-=======================================
+This is a "Button Builder" component for the XDI Connect protocol.
 
-This is a web interface for building HTML and XDI code for Respect Connect.
+### XDI Connect
 
-See this Google Doc for the specification:
-
-https://docs.google.com/a/respectnetwork.net/document/d/1iHW8Hw9LPIso7_zxk66FO9m4ifW54_KA5DDEPjoKBDM
-
-### How to build
-
-Just run
-
-    mvn clean install
-
-To build all components.
-
-### How to run
-
-    mvn jetty:run
-
-Then the Respect Network Respect Connect Builder is available at
-
-	http://localhost:7101/
+This is part of a set of projects related to XDI Connect:
+* [xdi2-connect-core](http://github.com/projectdanube/xdi2-connect-core)
+* [xdi2-connect-service](http://github.com/projectdanube/xdi2-connect-service)
+* [xdi2-connect-auth-service](http://github.com/projectdanube/xdi2-connect-auth-service)
+* [xdi2-connect-button-builder](http://github.com/projectdanube/xdi2-connect-button-builder)
+* [xdi2-connect-example-rp](http://github.com/projectdanube/xdi2-connect-example-rp)
 
 ### Information
 
-TODO
+
+### How to build
+
+First, you need to build the main [XDI2](http://github.com/projectdanube/xdi2) and the 
+[xdi2-connect-core](http://github.com/projectdanube/xdi2-connect-core) projects.
+
+After that, just run
+
+    mvn clean install jetty:run
+
+Then the Button Builder is available at
+
+	http://localhost:9203/
+
+### Community
+
+Google Group: http://groups.google.com/group/xdi2
