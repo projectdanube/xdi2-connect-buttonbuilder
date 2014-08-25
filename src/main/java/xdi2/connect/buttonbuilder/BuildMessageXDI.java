@@ -21,9 +21,9 @@ import xdi2.core.features.signatures.KeyPairSignature;
 import xdi2.core.io.XDIWriter;
 import xdi2.core.io.XDIWriterRegistry;
 import xdi2.core.io.writers.XDIJSONWriter;
-import xdi2.core.xri3.XDI3Segment;
-import xdi2.core.xri3.XDI3Statement;
-import xdi2.core.xri3.XDI3SubSegment;
+import xdi2.core.syntax.XDIAddress;
+import xdi2.core.syntax.XDIArc;
+import xdi2.core.syntax.XDIStatement;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.Operation;
@@ -32,10 +32,10 @@ public class BuildMessageXDI extends javax.servlet.http.HttpServlet implements j
 
 	private static final long serialVersionUID = 2395655719203845949L;
 
-	public static final XDI3SubSegment TO_PEER_ROOT_XRI = XDI3SubSegment.create("{$to}");
-	public static final XDI3Segment MESSAGE_TYPE = XDI3Segment.create("$connect[$v]#0$xdi[$v]#1$msg");
-	public static final XDI3Segment OPERATION_XRI = XDI3Segment.create("$set$do");
-	public static final XDI3Segment PARAMETER_RETURN_URL_XRI = XDI3Segment.create("<#return><$uri>");
+	public static final XDIArc TO_PEER_ROOT_XRI = XDIArc.create("{$to}");
+	public static final XDIAddress MESSAGE_TYPE = XDIAddress.create("$connect[$v]#0$xdi[$v]#1$msg");
+	public static final XDIAddress OPERATION_XRI = XDIAddress.create("$set$do");
+	public static final XDIAddress PARAMETER_RETURN_URL_XRI = XDIAddress.create("<#return><$uri>");
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -59,21 +59,21 @@ public class BuildMessageXDI extends javax.servlet.http.HttpServlet implements j
 		if (linkContractTemplateAddressString == null || linkContractTemplateAddressString.trim().isEmpty()) throw new ServletException("No link contract template address.");
 		if (privateKeyString == null || privateKeyString.trim().isEmpty()) throw new ServletException("No private key.");
 
-		XDI3Segment requestingParty = XDI3Segment.create(requestingPartyString);
+		XDIAddress requestingParty = XDIAddress.create(requestingPartyString);
 
-		XDI3Segment linkContractTemplateAddress = XDI3Segment.create(linkContractTemplateAddressString);
+		XDIAddress linkContractTemplateAddress = XDIAddress.create(linkContractTemplateAddressString);
 
 		boolean requestCloudName = "on".equals(requestCloudNameString);
 
 		String[] requestAttributesStrings = requestAttributesString.split("\n");
-		List<XDI3Segment> requestAttributes = new ArrayList<XDI3Segment> ();
+		List<XDIAddress> requestAttributes = new ArrayList<XDIAddress> ();
 
 		for (int i=0; i<requestAttributesStrings.length; i++) {
 
 			requestAttributesStrings[i] = requestAttributesStrings[i].trim();
 			if (requestAttributesStrings[i].isEmpty()) continue;
 
-			requestAttributes.add(XDI3Segment.create(requestAttributesStrings[i]));
+			requestAttributes.add(XDIAddress.create(requestAttributesStrings[i]));
 		}
 
 		PrivateKey privateKey;		
@@ -91,15 +91,15 @@ public class BuildMessageXDI extends javax.servlet.http.HttpServlet implements j
 		// create message HTML
 
 		Message message = new MessageEnvelope().createMessage(requestingParty);
-		message.setToPeerRootXri(TO_PEER_ROOT_XRI);
+		message.setToPeerRootXDIArc(TO_PEER_ROOT_XRI);
 		message.setMessageType(MESSAGE_TYPE);
 
 		Operation operation = message.createOperation(OPERATION_XRI, linkContractTemplateAddress);
 		operation.setParameter(PARAMETER_RETURN_URL_XRI, returnUrlString);
 
-		for (XDI3Segment requestAttribute : requestAttributes) message.createGetOperation(requestAttribute);
+		for (XDIAddress requestAttribute : requestAttributes) message.createGetOperation(requestAttribute);
 
-		if (requestCloudName) message.createGetOperation(XDI3Statement.create("{$to}/$is$ref/{}"));
+		if (requestCloudName) message.createGetOperation(XDIStatement.create("{$to}/$is$ref/{}"));
 
 		try {
 

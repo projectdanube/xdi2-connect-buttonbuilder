@@ -20,27 +20,27 @@ import org.apache.commons.codec.binary.Base64;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.constants.XDILinkContractConstants;
-import xdi2.core.features.linkcontracts.LinkContractTemplate;
-import xdi2.core.features.linkcontracts.policy.PolicyAnd;
-import xdi2.core.features.linkcontracts.policy.PolicyRoot;
-import xdi2.core.features.linkcontracts.policy.PolicyUtil;
-import xdi2.core.features.nodetypes.XdiVariable;
+import xdi2.core.features.linkcontracts.template.LinkContractTemplate;
+import xdi2.core.features.nodetypes.XdiAbstractVariable;
+import xdi2.core.features.policy.PolicyAnd;
+import xdi2.core.features.policy.PolicyRoot;
+import xdi2.core.features.policy.PolicyUtil;
 import xdi2.core.features.signatures.KeyPairSignature;
 import xdi2.core.features.signatures.Signatures;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIWriter;
 import xdi2.core.io.XDIWriterRegistry;
 import xdi2.core.io.writers.XDIJSONWriter;
-import xdi2.core.xri3.XDI3Segment;
-import xdi2.core.xri3.XDI3Statement;
+import xdi2.core.syntax.XDIAddress;
+import xdi2.core.syntax.XDIStatement;
 
 public class BuildLinkContractTemplateXDI extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 
 	private static final long serialVersionUID = -2033109040103002340L;
 
-	public static final XDI3Segment TO_PEER_ROOT_XRI = XDI3Segment.create("{$to}");
-	public static final XDI3Segment MESSAGE_TYPE = XDI3Segment.create("$connect[$v]#0$xdi[$v]#1$msg");
-	public static final XDI3Segment OPERATION_XRI = XDI3Segment.create("$set{$do}");
+	public static final XDIAddress TO_PEER_ROOT_XRI = XDIAddress.create("{$to}");
+	public static final XDIAddress MESSAGE_TYPE = XDIAddress.create("$connect[$v]#0$xdi[$v]#1$msg");
+	public static final XDIAddress OPERATION_XRI = XDIAddress.create("$set{$do}");
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -63,21 +63,21 @@ public class BuildLinkContractTemplateXDI extends javax.servlet.http.HttpServlet
 		if (linkContractTemplateAddressString == null || linkContractTemplateAddressString.trim().isEmpty()) throw new ServletException("No link contract template address.");
 		if (privateKeyString == null || privateKeyString.trim().isEmpty()) throw new ServletException("No private key.");
 
-		XDI3Segment requestingParty = XDI3Segment.create(requestingPartyString);
+		XDIAddress requestingParty = XDIAddress.create(requestingPartyString);
 
-		XDI3Segment linkContractTemplateAddress = XDI3Segment.create(linkContractTemplateAddressString);
+		XDIAddress linkContractTemplateAddress = XDIAddress.create(linkContractTemplateAddressString);
 
 		boolean requestCloudName = "on".equals(requestCloudNameString);
 
 		String[] requestAttributesStrings = requestAttributesString.split("\n");
-		List<XDI3Segment> requestAttributes = new ArrayList<XDI3Segment> ();
+		List<XDIAddress> requestAttributes = new ArrayList<XDIAddress> ();
 
 		for (int i=0; i<requestAttributesStrings.length; i++) {
 
 			requestAttributesStrings[i] = requestAttributesStrings[i].trim();
 			if (requestAttributesStrings[i].isEmpty()) continue;
 
-			requestAttributes.add(XDI3Segment.create(requestAttributesStrings[i]));
+			requestAttributes.add(XDIAddress.create(requestAttributesStrings[i]));
 		}
 
 		PrivateKey privateKey;		
@@ -97,7 +97,7 @@ public class BuildLinkContractTemplateXDI extends javax.servlet.http.HttpServlet
 		Graph graph = MemoryGraphFactory.getInstance().openGraph();
 		ContextNode linkContractTemplateContextNode = graph.setDeepContextNode(linkContractTemplateAddress);
 
-		LinkContractTemplate linkContractTemplate = LinkContractTemplate.fromXdiVariable(XdiVariable.fromContextNode(linkContractTemplateContextNode));
+		LinkContractTemplate linkContractTemplate = LinkContractTemplate.fromXdiVariable(XdiAbstractVariable.fromContextNode(linkContractTemplateContextNode));
 
 		PolicyRoot policyRoot = linkContractTemplate.getPolicyRoot(true);
 		PolicyAnd policyAnd = policyRoot.createAndPolicy(true);
@@ -105,9 +105,9 @@ public class BuildLinkContractTemplateXDI extends javax.servlet.http.HttpServlet
 		PolicyUtil.createSenderIsOperator(policyAnd, requestingParty);
 		PolicyUtil.createSignatureValidOperator(policyAnd);
 
-		for (XDI3Segment requestAttribute : requestAttributes) linkContractTemplate.setPermissionTargetAddress(XDILinkContractConstants.XRI_S_GET, requestAttribute);
+		for (XDIAddress requestAttribute : requestAttributes) linkContractTemplate.setPermissionTargetXDIAddress(XDILinkContractConstants.XDI_ADD_GET, requestAttribute);
 
-		if (requestCloudName) linkContractTemplate.setPermissionTargetStatement(XDILinkContractConstants.XRI_S_GET, XDI3Statement.create("{$to}/$is$ref/{}"));
+		if (requestCloudName) linkContractTemplate.setPermissionTargetXDIStatement(XDILinkContractConstants.XDI_ADD_GET, XDIStatement.create("{$to}/$is$ref/{}"));
 
 		// sign
 
