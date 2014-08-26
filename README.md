@@ -10,7 +10,7 @@ This is part of a set of projects related to XDI Connect:
 * [xdi2-connect-service](http://github.com/projectdanube/xdi2-connect-service)
 * [xdi2-connect-auth-service](http://github.com/projectdanube/xdi2-connect-auth-service)
 * [xdi2-connect-button-builder](http://github.com/projectdanube/xdi2-connect-button-builder)
-* [xdi2-connect-example-rp](http://github.com/projectdanube/xdi2-connect-example-rp)
+* [xdi2-connect-example-ra](http://github.com/projectdanube/xdi2-connect-example-ra)
 
 ### Information
 
